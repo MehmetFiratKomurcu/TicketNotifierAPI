@@ -7,5 +7,7 @@ namespace TicketNotifier.Repositories.Interfaces
     {
         Task<T> GetByIdAsync<T>(string id) where T : class;
         Task UpsertUserAsync(User user);
+        Task DeleteUser(string id);
+        Task<bool> UserExistsById(string id);
     }
 }

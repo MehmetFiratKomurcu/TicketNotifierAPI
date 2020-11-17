@@ -29,11 +29,29 @@ namespace TicketNotifier.Services.Implementations
                 response.Message = "Invalid Request";
                 return response;
             }
-            var user = CreateUserWithUpsertUserRequest(request);
-            await _userRepository.UpsertUserAsync(user);
 
-            response.Result = user;
+            var user = await _userRepository.GetByIdAsync<User>(request.Email);
+            
+            if (user == null)
+            {
+                var newUser = CreateUserWithUpsertUserRequest(request);
+                await _userRepository.UpsertUserAsync(newUser);
+            }
+            else
+            {
+                foreach (var requestEvent in request.Events)
+                {
+                    user.Events.Add(requestEvent);
+                }
+                await _userRepository.UpsertUserAsync(user);
+            }
+
             return response;
+        }
+
+        public async Task DeleteUser(string id)
+        {
+            await _userRepository.DeleteUser(id);
         }
 
         private static User CreateUserWithUpsertUserRequest(UpsertUserRequest request)

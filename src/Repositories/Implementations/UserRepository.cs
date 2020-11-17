@@ -28,6 +28,28 @@ namespace TicketNotifier.Repositories.Implementations
             var collection = await GetCollectionAsync();
             await collection.UpsertAsync(user.Email, user);
         }
+        
+        public async Task AppendEventByUserId(string userId, Event eventObject)
+        {
+            var collection = await GetCollectionAsync();
+            await collection.MutateInAsync(userId, builder =>
+            {
+                builder.ArrayAppend("events", eventObject, true);
+            });
+        }
+
+        public async Task DeleteUser(string id)
+        {
+            var collection = await GetCollectionAsync();
+            await collection.RemoveAsync(id);
+        }
+
+        public async Task<bool> UserExistsById(string id)
+        {
+            var collection = await GetCollectionAsync();
+            var exists = await collection.ExistsAsync(id);
+            return exists.Exists;
+        }
 
         private async Task<IGetResult> GetResultAsync(ICouchbaseCollection collection, string id)
         {
@@ -36,7 +58,7 @@ namespace TicketNotifier.Repositories.Implementations
                 var getResult = await collection.GetAsync(id);
                 return getResult;
             }
-            catch (DocumentNotFoundException e)
+            catch (DocumentNotFoundException)
             {
                 return null;
             }

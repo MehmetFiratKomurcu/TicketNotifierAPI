@@ -9,5 +9,6 @@ namespace TicketNotifier.Services.Interfaces
     {
         Task<BaseResponse<User>> UpsertUser(UpsertUserRequest request);
         Task<User> GetUserByIdAsync(string id);
+        Task DeleteUser(string id);
     }
 }
