@@ -30,20 +30,16 @@ namespace TicketNotifier.Services.Implementations
                 return response;
             }
 
-            var user = await _userRepository.GetByIdAsync<User>(request.Email);
+            var userExists = await _userRepository.UserExistsById(request.Email);
             
-            if (user == null)
+            if (!userExists)
             {
                 var newUser = CreateUserWithUpsertUserRequest(request);
                 await _userRepository.UpsertUserAsync(newUser);
             }
             else
             {
-                foreach (var requestEvent in request.Events)
-                {
-                    user.Events.Add(requestEvent);
-                }
-                await _userRepository.UpsertUserAsync(user);
+                await _userRepository.AppendEventByUserId(request.Email, request.Events);
             }
 
             return response;

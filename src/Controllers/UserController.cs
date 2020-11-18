@@ -39,12 +39,12 @@ namespace TicketNotifier.Controllers
                 return new BadRequestObjectResult(response);
             }
 
-            return new OkObjectResult(response.Result);
+            return new OkResult();
         }
         
         [HttpDelete]
         [Route("{id}")]
-        public async Task<IActionResult> DeleteEvent(string id)
+        public async Task<IActionResult> DeleteUser(string id)
         {
             await _userService.DeleteUser(id);
 

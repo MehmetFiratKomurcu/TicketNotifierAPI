@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Couchbase.Core.Exceptions.KeyValue;
 using Couchbase.KeyValue;
@@ -29,7 +30,7 @@ namespace TicketNotifier.Repositories.Implementations
             await collection.UpsertAsync(user.Email, user);
         }
         
-        public async Task AppendEventByUserId(string userId, Event eventObject)
+        public async Task AppendEventByUserId(string userId, List<Event> eventObject)
         {
             var collection = await GetCollectionAsync();
             await collection.MutateInAsync(userId, builder =>
@@ -41,7 +42,19 @@ namespace TicketNotifier.Repositories.Implementations
         public async Task DeleteUser(string id)
         {
             var collection = await GetCollectionAsync();
-            await collection.RemoveAsync(id);
+            await RemoveAsync(id, collection);
+        }
+
+        private static async Task RemoveAsync(string id, ICouchbaseCollection collection)
+        {
+            try
+            {
+                await collection.RemoveAsync(id);
+            }
+            catch (DocumentNotFoundException)
+            {
+                return;
+            }
         }
 
         public async Task<bool> UserExistsById(string id)
