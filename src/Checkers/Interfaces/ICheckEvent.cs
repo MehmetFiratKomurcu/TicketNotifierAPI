@@ -1,7 +1,9 @@
+using System.Threading.Tasks;
+
 namespace TicketNotifier.Checkers.Interfaces
 {
     public interface ICheckEvent
     {
-        void SayHello();
+        Task Run();
     }
 }

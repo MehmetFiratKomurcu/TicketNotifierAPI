@@ -1,19 +1,13 @@
 using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using Couchbase.Extensions.DependencyInjection;
+using Couchbase.Linq;
 using Hangfire;
 using Hangfire.MemoryStorage;
-using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using TicketNotifier.Checkers.Implementations;
 using TicketNotifier.Checkers.Interfaces;
 using TicketNotifier.Data;
@@ -58,6 +52,7 @@ namespace TicketNotifier
                 options.ConnectionString = "couchbase://localhost";
                 options.UserName = "mfk";
                 options.Password = "123456";
+                options.AddLinq();
             });
             services.AddCouchbaseBucket<ITicketBucketProvider>("ticket");
 
@@ -78,7 +73,7 @@ namespace TicketNotifier
             app.UseHangfireDashboard();
             backgroundJobs.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
             recurringJobManager.AddOrUpdate("checkEvent", 
-                () => serviceProvider.GetService<ICheckEvent>().SayHello(), "* * * * *");
+                () => serviceProvider.GetService<ICheckEvent>().Run(), "* * * * *");
             
             app.UseSwagger();
             
