@@ -10,6 +10,8 @@
       <PackageReference Include="Flurl.Http" Version="3.0.0" />
       <PackageReference Include="Hangfire" Version="1.7.17" />
       <PackageReference Include="Hangfire.MemoryStorage.Core" Version="1.4.0" />
+      <PackageReference Include="HtmlAgilityPack" Version="1.11.28" />
+      <PackageReference Include="Linq2Couchbase" Version="2.0.0-beta.1" />
       <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
       <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.6.3" />
     </ItemGroup>

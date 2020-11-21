@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Couchbase;
 using Couchbase.Core.Exceptions.KeyValue;
 using Couchbase.KeyValue;
+using Couchbase.Linq;
 using TicketNotifier.Data;
 using TicketNotifier.Entities;
 using TicketNotifier.Repositories.Interfaces;
@@ -24,6 +27,12 @@ namespace TicketNotifier.Repositories.Implementations
             return getResult?.ContentAs<T>();
         }
 
+        public async Task<List<User>> GetAllUsers()
+        {
+            var context = await GetContextAsync();
+            return context.Query<User>().Where(x => x.Type == "user").ToList();
+        }
+
         public async Task UpsertUserAsync(User user)
         {
             var collection = await GetCollectionAsync();
@@ -44,6 +53,13 @@ namespace TicketNotifier.Repositories.Implementations
             var collection = await GetCollectionAsync();
             await RemoveAsync(id, collection);
         }
+        
+        private async Task<BucketContext> GetContextAsync()
+        {
+            var bucket = await GetBucketAsync();
+            var context = new BucketContext(bucket);
+            return context;
+        }
 
         private static async Task RemoveAsync(string id, ICouchbaseCollection collection)
         {
@@ -53,7 +69,6 @@ namespace TicketNotifier.Repositories.Implementations
             }
             catch (DocumentNotFoundException)
             {
-                return;
             }
         }
 
@@ -79,9 +94,14 @@ namespace TicketNotifier.Repositories.Implementations
 
         private async Task<ICouchbaseCollection> GetCollectionAsync()
         {
-            var bucket = await _bucketProvider.GetBucketAsync();
+            var bucket = await GetBucketAsync();
             var collection = bucket.DefaultCollection();
             return collection;
+        }
+
+        private async Task<IBucket> GetBucketAsync()
+        {
+            return await _bucketProvider.GetBucketAsync();
         }
     }
 }
